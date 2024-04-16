@@ -6,7 +6,7 @@ use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer as SplTransfer
 use chainlink_solana as chainlink;
 use std::str::FromStr;
 
-declare_id!("6wJQkGLgGqfDsDhgX6JCvRu8ngZsmGw2M6iy7bjCVMQS");
+declare_id!("938Ddfngq8N4V2be6Afxkiy2hwMKpGj1vigNHC1p9Ws4");
 
 pub const CHAINLINK_PROGRAM: &str = "HEvSKofvBgfaexv23kMabbYqxasxU3mQ4ibBMEmJWHny";
 pub const CHAINLINK_FEED: &str = "99B2bTijsU6f1GCT73HmdR7HCFFjGMBcPZY6jZ96ynrR"; // (Devnet) - CH31Xns5z3M1cTAbKW34jcxPPciazARpijcHj9rxtemt(Mainnet)
@@ -679,7 +679,7 @@ fn calculate_price_internal(
 pub struct PresaleInit<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
-    #[account(init, payer = owner, space = 8 + 32 + 32 + 32 + 32 + 16 + 16 + (4 + (3 * (4 + (4 * 16)))) + 1 + 16 + 16 + 16 + 16 + 16 + 1 + 16 + (4 + (4 * 16)) + 1 + 32 + 32 + 1 + 16 + 16 + (4 + (5 * 32)), seeds = [(b"presale_account")], bump)]
+    #[account(init, payer = owner, space = 8 + PresaleAccount::INIT_SPACE, seeds = [(b"presale_account")], bump)]
     pub presale_account: Account<'info, PresaleAccount>,
     pub system_program: Program<'info, System>,
 }
@@ -786,6 +786,7 @@ pub struct IncrementCurrentRound<'info> {
 }
 
 #[account]
+#[derive(InitSpace)]
 pub struct PresaleAccount {
     pub owner: Pubkey,
     pub payment_wallet: Pubkey,
@@ -793,6 +794,7 @@ pub struct PresaleAccount {
     pub admin: Pubkey,
     pub start_time: u128,
     pub claim_start_time: u128,
+    #[max_len(3, 4)]
     pub rounds: Vec<Vec<u128>>,
     pub is_paused: bool,
     pub max_tokens_to_buy: u128,
@@ -802,6 +804,7 @@ pub struct PresaleAccount {
     pub usd_raised: u128,
     pub dynamic_time_change: bool,
     pub per_round_time: u128,
+    #[max_len(4)]
     pub unsold_tokens: Vec<u128>,
     pub whitelist_claim_only: bool,
     pub usdt_token: Pubkey,
@@ -809,6 +812,7 @@ pub struct PresaleAccount {
     pub sale_token_decimals: u8,
     pub tokens_added: u128,
     pub tokens_claimed: u128,
+    #[max_len(5)]
     pub whitelisted_users: Vec<Pubkey>,
 }
 
